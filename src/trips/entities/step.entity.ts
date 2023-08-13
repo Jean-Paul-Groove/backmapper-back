@@ -12,7 +12,7 @@ export class Step {
   @Column('text')
   description?: string;
   @Column()
-  pitcures: string = '';
+  pictures: string = '';
   @Column()
   date: string;
   @ManyToOne(() => Trip, (trip) => trip.steps)

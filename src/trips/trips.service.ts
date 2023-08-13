@@ -33,25 +33,29 @@ export class TripsService {
   async createStep(
     createStepDto: CreateStepDto,
     tripId: number,
+    pictures?: string[],
   ): Promise<Step> {
     try {
+      console.log('Depuis le service');
+      console.log(createStepDto);
       const step = new Step();
       step.title = createStepDto.title;
       step.coordinates = createStepDto.coordinates.toString();
-      step.date = createStepDto.date;
+      step.date = createStepDto.date.toString();
       step.description = createStepDto.description;
+      if (pictures) {
+        step.pictures = pictures.toString();
+      }
       step.trip = await this.tripRepository.findOne({
         where: { id: tripId },
       });
+
       const stepEntity = this.stepRepository.create(step);
       await this.stepRepository.save(stepEntity);
-      Logger.log('Nouveau step ajouté');
-      Logger.log('step = ' + step);
-      Logger.log('stepEntity = ' + stepEntity);
       return stepEntity;
     } catch (error) {
-      Logger.log(error);
-      Logger.log('erreur !!! ' + createStepDto);
+      console.log(error);
+      console.log('erreur !! ' + createStepDto);
     }
   }
 
