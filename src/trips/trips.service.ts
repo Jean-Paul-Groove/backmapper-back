@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateTripDto } from './dto/create-trip.dto';
-import { UpdateTripDto } from './dto/update-trip.dto';
+import { UpdateStepDto } from './dto/update-step.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Trip } from './entities/trip.entity';
 import { Step } from './entities/step.entity';
@@ -73,13 +73,31 @@ export class TripsService {
     });
   }
 
-  update(id: number, updateTripDto: UpdateTripDto) {
-    console.log(updateTripDto);
-    console.log(updateTripDto);
-    return `This action updates a #${id} trip`;
+  async updateStep(id: number, updateStepDto: UpdateStepDto) {
+    return `This action updates a #${id} step with ${updateStepDto}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} trip`;
+  async removeStep(id: number) {
+    const stepToRemove = await this.stepRepository.findOne({
+      where: { id: id },
+    });
+    if (!stepToRemove) {
+      throw new NotFoundException(`Le step avec id ${id} n'existe pas`);
+    }
+    return await this.stepRepository.remove(stepToRemove);
+  }
+  async removeTrip(id: number) {
+    const tripToRemove = await this.tripRepository.findOne({
+      where: { id: id },
+      relations: { steps: true },
+    });
+    if (!tripToRemove) {
+      throw new NotFoundException(`Le trip avec id ${id} n'existe pas`);
+    }
+
+    const tripDeleted = await this.tripRepository.remove(tripToRemove);
+    /* await this.stepRepository.remove(stepsToRemove);
+    const stepsToRemove = await this.stepRepository.findBy({ id: id }); */
+    return tripDeleted;
   }
 }

@@ -6,7 +6,13 @@ import * as sharp from 'sharp';
 export class ImgOptimizationPipe
   implements PipeTransform<Express.Multer.File[], Promise<string[]>>
 {
-  async transform(images: Express.Multer.File[]): Promise<string[]> {
+  async transform(
+    images: Express.Multer.File[] | null,
+  ): Promise<string[] | null> {
+    if (!images) {
+      return null;
+    }
+
     const newImages: string[] = [];
     for (const image of images) {
       console.log(image);
