@@ -3,11 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
   UploadedFiles,
+  Put,
 } from '@nestjs/common';
 import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
@@ -19,6 +19,8 @@ import { multerConfig } from 'src/configuration/multer.config';
 import { CreateStepWithPicturesDto } from './dto/create-step-with-pictures.dto';
 import { ImgOptimizationPipe } from './pipes/imgOptimization.pipe';
 import { UpdateStepDto } from './dto/update-step.dto';
+import { UpdateStepWithPicturesDto } from './dto/update-step-with-pictures.dto';
+import { UpdateResult } from 'typeorm';
 
 @Controller('trips')
 export class TripsController {
@@ -36,13 +38,10 @@ export class TripsController {
     @Param('id') id: string,
   ): Promise<Step> {
     try {
-      console.log(pictures);
-      console.log('Depuis le controller');
       if (!pictures) {
         return this.tripsService.createStep(body as CreateStepDto, +id);
       } else {
         const stepWithPictures = body as CreateStepWithPicturesDto;
-        console.log(' Depuis le controlleur => doit avoir une image');
         const newStepContent = JSON.parse(stepWithPictures.stepInfo);
         return this.tripsService.createStep(newStepContent, +id, pictures);
       }
@@ -61,12 +60,22 @@ export class TripsController {
     return this.tripsService.findOne(+id);
   }
 
-  @Patch('steps/:stepId')
+  @Put('steps/:stepId')
+  @UseInterceptors(FilesInterceptor('files', 4))
   updateStep(
+    @UploadedFiles(ImgOptimizationPipe) pictures: string[] | null,
+    @Body() body: UpdateStepDto | UpdateStepWithPicturesDto,
     @Param('stepId') id: string,
-    @Body() updateStepDto: UpdateStepDto,
-  ) {
-    return this.tripsService.updateStep(+id, updateStepDto);
+  ): Promise<UpdateResult> {
+    let updateStepDto;
+    if (!pictures) {
+      updateStepDto = body;
+      return this.tripsService.updateStep(+id, updateStepDto);
+    } else {
+      const stepWithPictures = body as UpdateStepWithPicturesDto;
+      updateStepDto = JSON.parse(stepWithPictures.stepInfo);
+      return this.tripsService.updateStep(+id, updateStepDto, pictures);
+    }
   }
 
   @Delete('steps/:stepId')

@@ -3,5 +3,5 @@ export class UpdateStepDto {
   description: string;
   coordinates: [longitude: number, latitude: number];
   date: number;
-  pictures: string[];
+  picturesToDelete?: string[];
 }

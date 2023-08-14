@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateStepDto } from './dto/update-step.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -37,8 +43,6 @@ export class TripsService {
     pictures?: string[],
   ): Promise<Step> {
     try {
-      console.log('Depuis le service');
-      console.log(createStepDto);
       const step = new Step();
       step.title = createStepDto.title;
       step.coordinates = createStepDto.coordinates.toString();
@@ -74,8 +78,46 @@ export class TripsService {
     });
   }
 
-  async updateStep(id: number, updateStepDto: UpdateStepDto) {
-    return `This action updates a #${id} step with ${updateStepDto}`;
+  async updateStep(
+    id: number,
+    updateStepDto: UpdateStepDto,
+    pictures?: string[],
+  ) {
+    const updateEntity = new Step();
+    const { title, description, coordinates, date } = updateStepDto;
+    updateEntity.title = title;
+    updateEntity.description = description;
+    updateEntity.coordinates = coordinates.toString();
+    updateEntity.date = date.toString();
+    const currentPictures = (
+      await this.stepRepository.findOneBy({ id })
+    ).pictures.split(',');
+    const picturesAfterDeletion = updateStepDto.picturesToDelete
+      ? currentPictures.filter(
+          (picture) =>
+            updateStepDto.picturesToDelete.includes(picture) === false,
+        )
+      : currentPictures;
+    if (pictures) {
+      const newPictureArray = [...picturesAfterDeletion, ...pictures];
+      if (newPictureArray.length > 4) {
+        this.deleteImagesFromServer(pictures.toString());
+        throw new HttpException(
+          'Maximum 4 photos par étapes ...',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        updateEntity.pictures = newPictureArray.toString();
+      }
+    } else {
+      updateEntity.pictures = picturesAfterDeletion.toString();
+    }
+    const stepUpdated = await this.stepRepository.update({ id }, updateEntity);
+    if (updateStepDto.picturesToDelete) {
+      this.deleteImagesFromServer(updateStepDto.picturesToDelete.toString());
+    }
+
+    return stepUpdated;
   }
 
   async removeStep(id: number) {
