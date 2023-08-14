@@ -6,6 +6,7 @@ import { Trip } from './entities/trip.entity';
 import { Step } from './entities/step.entity';
 import { Repository } from 'typeorm';
 import { CreateStepDto } from './dto/create-step.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class TripsService {
@@ -84,7 +85,9 @@ export class TripsService {
     if (!stepToRemove) {
       throw new NotFoundException(`Le step avec id ${id} n'existe pas`);
     }
-    return await this.stepRepository.remove(stepToRemove);
+    const stepRemoved = await this.stepRepository.remove(stepToRemove);
+    this.deleteImagesFromServer(stepRemoved.pictures);
+    return stepRemoved;
   }
   async removeTrip(id: number) {
     const tripToRemove = await this.tripRepository.findOne({
@@ -99,5 +102,15 @@ export class TripsService {
     /* await this.stepRepository.remove(stepsToRemove);
     const stepsToRemove = await this.stepRepository.findBy({ id: id }); */
     return tripDeleted;
+  }
+  private deleteImagesFromServer(images: string) {
+    const imgArray: string[] = images.split(',');
+    for (const img of imgArray) {
+      fs.unlink(img, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
   }
 }
