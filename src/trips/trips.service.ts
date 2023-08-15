@@ -23,7 +23,6 @@ export class TripsService {
 
   async createTrip(createTripDto: CreateTripDto) {
     try {
-      Logger.log(createTripDto);
       const trip = new Trip();
       trip.title = createTripDto.title;
       trip.color = createTripDto.color;
@@ -36,7 +35,29 @@ export class TripsService {
       Logger.log(createTripDto);
     }
   }
+  async findAll(): Promise<Trip[]> {
+    const trips = await this.tripRepository.find({
+      relations: { steps: true },
+    });
+    return trips;
+  }
 
+  async findOne(id: number) {
+    return await this.tripRepository.findOne({
+      where: { id: id },
+      relations: { steps: true },
+    });
+  }
+
+  async updateTrip(id: number, newTripInfo: CreateTripDto) {
+    const updatedTrip = new Trip();
+    updatedTrip.title = newTripInfo.title;
+    updatedTrip.color = newTripInfo.color;
+    updatedTrip.startDate = newTripInfo.startDate;
+    const tripEntity = this.tripRepository.create(updatedTrip);
+    const tripUpdated = await this.tripRepository.update({ id }, tripEntity);
+    return tripUpdated;
+  }
   async createStep(
     createStepDto: CreateStepDto,
     tripId: number,
@@ -64,34 +85,22 @@ export class TripsService {
     }
   }
 
-  async findAll(): Promise<Trip[]> {
-    const trips = await this.tripRepository.find({
-      relations: { steps: true },
-    });
-    return trips;
-  }
-
-  async findOne(id: number) {
-    return await this.tripRepository.findOne({
-      where: { id: id },
-      relations: { steps: true },
-    });
-  }
-
   async updateStep(
     id: number,
     updateStepDto: UpdateStepDto,
     pictures?: string[],
   ) {
+    const stepToUpdate = await this.stepRepository.findOneBy({ id });
+    if (!stepToUpdate) {
+      throw new HttpException('Step not found', HttpStatus.NOT_FOUND);
+    }
     const updateEntity = new Step();
     const { title, description, coordinates, date } = updateStepDto;
     updateEntity.title = title;
     updateEntity.description = description;
     updateEntity.coordinates = coordinates.toString();
     updateEntity.date = date.toString();
-    const currentPictures = (
-      await this.stepRepository.findOneBy({ id })
-    ).pictures.split(',');
+    const currentPictures = stepToUpdate.pictures.split(',');
     const picturesAfterDeletion = updateStepDto.picturesToDelete
       ? currentPictures.filter(
           (picture) =>
@@ -141,8 +150,11 @@ export class TripsService {
     }
 
     const tripDeleted = await this.tripRepository.remove(tripToRemove);
-    /* await this.stepRepository.remove(stepsToRemove);
-    const stepsToRemove = await this.stepRepository.findBy({ id: id }); */
+    const stepsPicturesToBeDeleted = tripDeleted.steps.map(
+      (step) => step.pictures,
+    );
+    console.log(stepsPicturesToBeDeleted);
+    this.deleteImagesFromServer(stepsPicturesToBeDeleted.toString());
     return tripDeleted;
   }
   private deleteImagesFromServer(images: string) {

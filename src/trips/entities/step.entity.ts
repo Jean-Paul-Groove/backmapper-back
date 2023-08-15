@@ -15,6 +15,6 @@ export class Step {
   pictures: string = '';
   @Column()
   date: string;
-  @ManyToOne(() => Trip, (trip) => trip.steps)
+  @ManyToOne(() => Trip, (trip) => trip.steps, { onDelete: 'CASCADE' })
   trip: Trip;
 }

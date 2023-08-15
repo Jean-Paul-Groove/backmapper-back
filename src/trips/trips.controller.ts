@@ -30,6 +30,26 @@ export class TripsController {
   createTrip(@Body() createTripDto: CreateTripDto): Promise<Trip> {
     return this.tripsService.createTrip(createTripDto);
   }
+  @Get()
+  findAllTrips(): Promise<Trip[]> {
+    return this.tripsService.findAll();
+  }
+  @Get(':id')
+  findOneTrip(@Param('id') id: string) {
+    return this.tripsService.findOne(+id);
+  }
+  @Put('/:id')
+  updateTrip(
+    @Param('id') id: string,
+    @Body() newTripInfo: CreateTripDto,
+  ): Promise<UpdateResult> {
+    return this.tripsService.updateTrip(+id, newTripInfo);
+  }
+  @Delete(':id')
+  removeTrip(@Param('id') id: string) {
+    return this.tripsService.removeTrip(+id);
+  }
+
   @Post(':id/step')
   @UseInterceptors(FilesInterceptor('files', 4, multerConfig))
   createStep(
@@ -49,17 +69,6 @@ export class TripsController {
       console.log(error);
     }
   }
-
-  @Get()
-  findAllTrips(): Promise<Trip[]> {
-    return this.tripsService.findAll();
-  }
-
-  @Get(':id')
-  findOneTrip(@Param('id') id: string) {
-    return this.tripsService.findOne(+id);
-  }
-
   @Put('steps/:stepId')
   @UseInterceptors(FilesInterceptor('files', 4))
   updateStep(
@@ -81,9 +90,5 @@ export class TripsController {
   @Delete('steps/:stepId')
   removeStep(@Param('stepId') id: string) {
     return this.tripsService.removeStep(+id);
-  }
-  @Delete(':id')
-  removeTrip(@Param('id') id: string) {
-    return this.tripsService.removeTrip(+id);
   }
 }
