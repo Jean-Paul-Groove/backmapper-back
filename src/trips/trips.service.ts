@@ -71,7 +71,6 @@ export class TripsService {
     const stepsPicturesToBeDeleted = tripDeleted.steps.map(
       (step) => step.pictures,
     );
-    console.log(stepsPicturesToBeDeleted);
     this.stepService.deleteImagesFromServer(
       stepsPicturesToBeDeleted.toString(),
     );

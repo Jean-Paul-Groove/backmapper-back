@@ -41,7 +41,6 @@ export class StepsService {
       return stepEntity;
     } catch (error) {
       console.log(error);
-      console.log('erreur !! ' + createStepDto);
     }
   }
 
