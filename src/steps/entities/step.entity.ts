@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Trip } from './trip.entity';
+import { Trip } from '../../trips/entities/trip.entity';
 
 @Entity()
 export class Step {

@@ -5,6 +5,7 @@
 # Step assets
 step-pictures/*
 
+.env
 # Logs
 logs
 *.log

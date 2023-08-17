@@ -15,7 +15,6 @@ export class ImgOptimizationPipe
 
     const newImages: string[] = [];
     for (const image of images) {
-      console.log(image);
       const originalName = path.parse(image.originalname).name;
       const filename = Date.now() + '-' + originalName + '.webp';
 
@@ -26,7 +25,6 @@ export class ImgOptimizationPipe
 
       newImages.push('step-pictures/' + filename);
     }
-    console.log(newImages);
     return newImages;
   }
 }
