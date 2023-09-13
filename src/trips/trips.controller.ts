@@ -14,7 +14,7 @@ import { Trip } from './entities/trip.entity';
 import { UpdateResult } from 'typeorm';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('trips')
+@Controller('api/trips')
 export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
   @UseGuards(AuthGuard)

@@ -7,8 +7,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.useStaticAssets(join(__dirname, '..', 'step-pictures'), {
-    prefix: '/step-pictures/',
+    prefix: '/api/step-pictures/',
   });
-  await app.listen(3000);
+  console.log(process.env.PORT);
+  await app.listen(process.env.PORT);
 }
 bootstrap();
