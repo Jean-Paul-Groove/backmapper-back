@@ -22,7 +22,7 @@ jobs:
           echo ${{ secrets.GH_SECRET }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build and Publish
         run: |
-          docker build  --build-arg DB_HOST=${{secrets.DB_HOST}} --build-arg DB_PORT=${{secrets.DB_PORT}} --build-arg DB_USERNAME=${{secrets.DB_USERNAME}} --build-arg DB_PASSWORD=${{secrets.DB_PASSWORD}} --build-arg DB_NAME=${{secrets.DB_NAME}} --build-arg JWT_EXPIRATION=${{secrets.JWT_EXPIRATION}} --build-arg JWT_SECRET=${{secrets.JWT_SECRET}} -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} . 
+          docker build  --build-arg DB_HOST=${{secrets.DB_HOST}} --build-arg DB_PORT=${{secrets.DB_PORT}} --build-arg DB_USERNAME=${{secrets.DB_USERNAME}} --build-arg DB_PASSWORD=${{secrets.DB_PASSWORD}} --build-arg DB_NAME=${{secrets.DB_NAME}} --build-arg JWT_EXPIRATION=${{secrets.JWT_EXPIRATION}} --build-arg JWT_SALT=${{secrets.JWT_SALT}} -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} . 
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
   deploy:
