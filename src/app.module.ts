@@ -11,14 +11,9 @@ import { StepsModule } from './steps/steps.module';
 import { User } from './auth/entities/user.entity';
 import generalConfig from './configuration/general.config';
 import { JwtModule } from '@nestjs/jwt';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'front'),
-    }),
     ConfigModule.forRoot({
       envFilePath: '.env',
       load: [generalConfig],
