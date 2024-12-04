@@ -25,6 +25,7 @@ RUN npm install bcrypt
 RUN npm install
 RUN npm run build
 
+VOLUME /step-pictures/
 
 EXPOSE 443
 EXPOSE 7512
