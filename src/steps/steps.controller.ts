@@ -21,7 +21,7 @@ import { UpdateStepWithPicturesDto } from './dto/update-step-with-pictures.dto';
 import { Step } from './entities/step.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('api/trips/steps')
+@Controller('trips/steps')
 export class StepsController {
   constructor(private readonly stepsService: StepsService) {}
 

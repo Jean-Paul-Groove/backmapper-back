@@ -3,7 +3,7 @@
 /node_modules
 /front
 # Step assets
-step-pictures/*
+step-pictures/*.webp
 
 package.lock.json
 yarn.lock
